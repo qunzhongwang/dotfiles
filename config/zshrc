@@ -1,0 +1,67 @@
+# =============================================================================
+# Dotfiles: zshrc
+# Portable zsh configuration — secrets loaded from .env or bare env vars
+# =============================================================================
+
+# --- Secrets & Environment ---------------------------------------------------
+# Supports: .env file (HPC, local, docker --env-file) AND bare env vars (vast.ai, autodl)
+[ -f "$HOME/.env" ] && { source "$HOME/.env"; chmod 600 "$HOME/.env" 2>/dev/null; }
+
+# Defaults for optional variables
+: "${DISK:=$HOME}"
+: "${WORKSPACE_DIR:=$HOME/wp}"
+
+# --- Oh My Zsh ---------------------------------------------------------------
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="robbyrussell"
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions)
+[ -d "$ZSH" ] && source "$ZSH/oh-my-zsh.sh"
+
+# --- General ------------------------------------------------------------------
+export TERM=xterm-256color
+export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+
+# --- CUDA (auto-detect) ------------------------------------------------------
+if [ -d /usr/local/cuda ]; then
+  export PATH="/usr/local/cuda/bin:$PATH"
+  export LD_LIBRARY_PATH="/usr/local/cuda/lib64:${LD_LIBRARY_PATH:-}"
+fi
+
+# --- Cache Configuration -----------------------------------------------------
+export HF_HOME="${DISK}/.cache/huggingface"
+export TORCH_HOME="${DISK}/.cache/torch"
+export PIP_CACHE_DIR="${DISK}/.cache/pip"
+export UV_CACHE_DIR="${DISK}/.cache/uv"
+export TQDM_MININTERVAL=10
+
+# --- Workspace Aliases --------------------------------------------------------
+export WORKSPACE_DIR
+alias w="cd $WORKSPACE_DIR"
+alias wv="cd $WORKSPACE_DIR/reason-vlm"
+alias wvr="cd $WORKSPACE_DIR/reason-vlm/reason-vlm-rl"
+alias wve="cd $WORKSPACE_DIR/reason-vlm/reason-vlm-eval"
+alias wr="cd $WORKSPACE_DIR/routines"
+alias wr-vllm="cd $WORKSPACE_DIR/routines/subroutine_vllm"
+
+# --- FZF ----------------------------------------------------------------------
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# --- NVM ----------------------------------------------------------------------
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+
+# --- Conda --------------------------------------------------------------------
+if [ -f "$HOME/miniconda3/bin/conda" ]; then
+  __conda_setup="$("$HOME/miniconda3/bin/conda" 'shell.zsh' 'hook' 2>/dev/null)"
+  if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+  else
+    if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+      . "$HOME/miniconda3/etc/profile.d/conda.sh"
+    else
+      export PATH="$HOME/miniconda3/bin:$PATH"
+    fi
+  fi
+  unset __conda_setup
+fi

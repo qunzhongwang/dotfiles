@@ -1,0 +1,8 @@
+envs_dirs:
+  - ~/miniconda3/envs
+  - ~/.conda/envs
+pkgs_dirs:
+  - ~/miniconda3/pkgs
+  - ~/.conda/pkgs
+auto_activate_base: false
+changeps1: true

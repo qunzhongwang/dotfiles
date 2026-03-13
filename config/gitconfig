@@ -1,0 +1,21 @@
+[user]
+	name = qunzhong wang
+	email = qunzhong@link.cuhk.edu.hk
+	signingkey = ~/.ssh/id_ed25519.pub
+[core]
+	excludesfile = ~/.gitignore_global
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[alias]
+	graph = log --all --oneline --graph
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
+[includeIf "hasconfig:remote.*.url:*"]
+	# Disable signing if no SSH key present (e.g., fresh Docker container)
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers

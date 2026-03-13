@@ -1,0 +1,37 @@
+# =============================================================================
+# Dotfiles: bashrc
+# Minimal bash fallback — auto-switches to zsh if available
+# =============================================================================
+
+# Source system defaults
+[ -f /etc/bashrc ] && . /etc/bashrc
+
+# Load secrets
+[ -f "$HOME/.env" ] && { source "$HOME/.env"; chmod 600 "$HOME/.env" 2>/dev/null; }
+
+# PATH
+export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+
+# Defaults
+: "${DISK:=$HOME}"
+: "${WORKSPACE_DIR:=$HOME/wp}"
+
+# Conda
+if [ -f "$HOME/miniconda3/bin/conda" ]; then
+  __conda_setup="$("$HOME/miniconda3/bin/conda" 'shell.bash' 'hook' 2>/dev/null)"
+  if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+  else
+    if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+      . "$HOME/miniconda3/etc/profile.d/conda.sh"
+    else
+      export PATH="$HOME/miniconda3/bin:$PATH"
+    fi
+  fi
+  unset __conda_setup
+fi
+
+# Auto-switch to zsh if available and not already in zsh
+if command -v zsh >/dev/null 2>&1 && [ -z "$ZSH_VERSION" ] && [ -t 0 ]; then
+  exec zsh
+fi

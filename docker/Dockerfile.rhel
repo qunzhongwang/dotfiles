@@ -1,0 +1,21 @@
+FROM nvidia/cuda:12.6.3-devel-rockylinux9
+
+# Minimal system deps needed before install.sh takes over
+RUN dnf install -y \
+    sudo curl wget git zsh ca-certificates \
+    && dnf clean all
+
+WORKDIR /root
+
+# Copy dotfiles repo (secrets excluded via .dockerignore)
+COPY . /root/dotfiles
+
+# Bootstrap the environment
+RUN cd dotfiles && bash install.sh
+
+# Entrypoint handles secrets at runtime
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["zsh"]
