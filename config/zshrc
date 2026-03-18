@@ -65,3 +65,9 @@ if [ -f "$HOME/miniconda3/bin/conda" ]; then
   fi
   unset __conda_setup
 fi
+
+# --- Claude Code Poe Proxy ---------------------------------------------------
+export ANTHROPIC_BASE_URL="https://api.poe.com"
+export ANTHROPIC_AUTH_TOKEN="$POE_API_KEY"
+export ANTHROPIC_API_KEY="" # Important: Must be explicitly empty
+export EDITOR="cursor"

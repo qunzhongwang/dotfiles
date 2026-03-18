@@ -1,0 +1,21 @@
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y \
+    sudo curl wget git zsh ca-certificates \
+    vim nano net-tools iputils-ping dnsutils \
+    iproute2 traceroute \
+    zip unzip tar \
+    build-essential \
+    htop tree \
+    python3 python3-pip python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+
+WORKDIR /root
+COPY . /root/dotfiles
+RUN cd dotfiles && bash install.sh
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["zsh"]
