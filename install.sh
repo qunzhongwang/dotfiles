@@ -60,6 +60,12 @@ echo ""
 echo "--- Linking dotfiles ---"
 bash "$SCRIPT_DIR/scripts/link-dotfiles.sh"
 
+# Install tmux plugins via TPM (non-interactive)
+if [ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
+  echo "Installing tmux plugins..."
+  "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true
+fi
+
 # Step 4: Clone private repos
 echo ""
 echo "--- Cloning private repos ---"
