@@ -71,6 +71,11 @@ echo ""
 echo "--- Cloning private repos ---"
 bash "$SCRIPT_DIR/scripts/clone-repos.sh"
 
+# Step 5: Install VS Code launch.json template
+echo ""
+echo "--- Setting up VS Code debug config ---"
+bash "$SCRIPT_DIR/scripts/setup-vscode.sh"
+
 echo ""
 echo "=== Done! ==="
 echo "Start a new shell:  exec zsh"

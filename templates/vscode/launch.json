@@ -1,0 +1,89 @@
+{
+    "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "attachHost",
+            "type": "promptString",
+            "description": "Remote host for debugpy attach",
+            "default": "localhost"
+        },
+        {
+            "id": "attachPort",
+            "type": "promptString",
+            "description": "Remote port for debugpy attach",
+            "default": "5678"
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Current File (justMyCode)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Current File (TRITON_INTERPRET=1)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false,
+            "env": {
+                "TRITON_INTERPRET": "1"
+            }
+        },
+        {
+            "name": "Debugpy: attach (localhost:5678)",
+            "type": "debugpy",
+            "request": "attach",
+            "justMyCode": false,
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            }
+        },
+        {
+            "name": "Debugpy: attach (localhost:5678, justMyCode)",
+            "type": "debugpy",
+            "request": "attach",
+            "justMyCode": true,
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            }
+        },
+        {
+            "name": "Debugpy: attach remote (prompt host/port)",
+            "type": "debugpy",
+            "request": "attach",
+            "justMyCode": false,
+            "connect": {
+                "host": "${input:attachHost}",
+                "port": "${input:attachPort}"
+            }
+        },
+        {
+            "name": "Debugpy: attach remote (prompt host/port, justMyCode)",
+            "type": "debugpy",
+            "request": "attach",
+            "justMyCode": true,
+            "connect": {
+                "host": "${input:attachHost}",
+                "port": "${input:attachPort}"
+            }
+        }
+    ]
+}
