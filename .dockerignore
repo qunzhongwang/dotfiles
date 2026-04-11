@@ -2,3 +2,5 @@
 .git
 *.md
 .gitignore
+.pytest_cache
+.vscode
