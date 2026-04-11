@@ -103,4 +103,13 @@ else
   echo "cloudflared already installed, skipping."
 fi
 
+# --- TPM (Tmux Plugin Manager) ------------------------------------------------
+TPM_DIR="$HOME/.tmux/plugins/tpm"
+if [ ! -d "$TPM_DIR" ]; then
+  echo "Installing TPM (Tmux Plugin Manager)..."
+  git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
+else
+  echo "TPM already installed, skipping."
+fi
+
 echo "All user-level tools installed."
