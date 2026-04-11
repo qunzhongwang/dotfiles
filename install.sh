@@ -50,6 +50,11 @@ echo ""
 echo "--- Installing user-level tools ---"
 bash "$SCRIPT_DIR/scripts/install-tools.sh"
 
+# Step 2.5: SSH keys (if SSH_PRIVATE_KEY is set)
+echo ""
+echo "--- Setting up SSH keys ---"
+bash "$SCRIPT_DIR/scripts/setup-ssh.sh"
+
 # Step 3: Link dotfiles
 echo ""
 echo "--- Linking dotfiles ---"
@@ -65,5 +70,5 @@ echo "=== Done! ==="
 echo "Start a new shell:  exec zsh"
 echo ""
 echo "Optional next steps:"
-echo "  1. Set up secrets:  cp ~/dotfiles/.env.example ~/.env && vim ~/.env"
-echo "  2. Redirect cache:  DISK=/path/to/datadisk bash ~/dotfiles/setup-disk.sh"
+echo "  1. Set up secrets:  cp $SCRIPT_DIR/.env.example ~/.env && vim ~/.env"
+echo "  2. Redirect cache:  bash $SCRIPT_DIR/setup-disk.sh /path/to/datadisk"

@@ -7,6 +7,11 @@
 # Load .env if mounted or present (bare env vars from cloud UI take precedence)
 [ -f "$HOME/.env" ] && source "$HOME/.env"
 
+# Set up SSH keys if provided
+if [ -n "${SSH_PRIVATE_KEY:-}" ]; then
+  bash /root/dotfiles/scripts/setup-ssh.sh
+fi
+
 # Auto-generate .netrc for wandb
 if [ -n "${WANDB_API_KEY:-}" ]; then
   printf "machine api.wandb.ai\n  login user\n  password %s\n" "$WANDB_API_KEY" > "$HOME/.netrc"
