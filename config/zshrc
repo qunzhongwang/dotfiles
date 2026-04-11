@@ -4,11 +4,11 @@
 # =============================================================================
 
 # --- Secrets & Environment ---------------------------------------------------
-# Supports: .env file (HPC, local, docker --env-file) AND bare env vars (vast.ai, autodl)
 [ -f "$HOME/.env" ] && { source "$HOME/.env"; chmod 600 "$HOME/.env" 2>/dev/null; }
 
 # Defaults for optional variables
 : "${DISK:=$HOME}"
+: "${DISK_MODE:=symlink}"
 : "${WORKSPACE_DIR:=$HOME/wp}"
 
 # --- Oh My Zsh ---------------------------------------------------------------
@@ -27,11 +27,24 @@ if [ -d /usr/local/cuda ]; then
   export LD_LIBRARY_PATH="/usr/local/cuda/lib64:${LD_LIBRARY_PATH:-}"
 fi
 
-# --- Cache Configuration -----------------------------------------------------
-export HF_HOME="${DISK}/.cache/huggingface"
-export TORCH_HOME="${DISK}/.cache/torch"
-export PIP_CACHE_DIR="${DISK}/.cache/pip"
-export UV_CACHE_DIR="${DISK}/.cache/uv"
+# --- Cache & Workspace Configuration -----------------------------------------
+if [ "$DISK_MODE" = "workspace" ]; then
+  # Workspace mode: everything lives directly under $DISK
+  export HF_HOME="$DISK/.cache/huggingface"
+  export TORCH_HOME="$DISK/.cache/torch"
+  export PIP_CACHE_DIR="$DISK/.cache/pip"
+  export UV_CACHE_DIR="$DISK/.cache/uv"
+  # Override WORKSPACE_DIR default if user hasn't explicitly set it and DISK is not HOME
+  if [ "$DISK" != "$HOME" ] && [ "$WORKSPACE_DIR" = "$HOME/wp" ]; then
+    export WORKSPACE_DIR="$DISK/wp"
+  fi
+else
+  # Symlink mode (default): ~/.cache is symlinked, use $DISK paths directly
+  export HF_HOME="${DISK}/.cache/huggingface"
+  export TORCH_HOME="${DISK}/.cache/torch"
+  export PIP_CACHE_DIR="${DISK}/.cache/pip"
+  export UV_CACHE_DIR="${DISK}/.cache/uv"
+fi
 export TQDM_MININTERVAL=10
 
 # --- Workspace Aliases --------------------------------------------------------
