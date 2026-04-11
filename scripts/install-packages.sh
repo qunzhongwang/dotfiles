@@ -38,7 +38,6 @@ case "$PKG_MGR" in
       neovim \
       curl \
       wget \
-      xclip \
       unzip \
       jq \
       ca-certificates \
@@ -59,7 +58,6 @@ case "$PKG_MGR" in
       neovim \
       curl \
       wget \
-      xclip \
       unzip \
       jq \
       ca-certificates \
