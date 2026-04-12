@@ -23,10 +23,11 @@ One `install.sh` to bootstrap any fresh Linux machine. One `setup-disk.sh` to re
 ```bash
 git clone https://github.com/qunzhongwang/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-cp .env.example ~/.env
+# cp .env.example ~/.env
 vim ~/.env                    # fill in your tokens
 bash install.sh               # installs everything
 exec zsh                      # switch to new shell
+# cursor 
 ```
 
 ### Option B: Docker (Build Locally + Push to GHCR)

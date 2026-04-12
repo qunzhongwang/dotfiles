@@ -210,6 +210,16 @@ else
 fi
 chmod 600 "$ENV_FILE"
 
+# --- Install VS Code launch.json into workspace ------------------------------
+# Now that DISK_MODE is finalized, setup-vscode.sh will resolve the correct
+# $WORKSPACE_DIR (either ~/wp or $DISK/wp) and link the template there.
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -x "$SCRIPT_DIR/scripts/setup-vscode.sh" ]; then
+  echo ""
+  echo "--- Setting up VS Code debug config ---"
+  bash "$SCRIPT_DIR/scripts/setup-vscode.sh"
+fi
+
 echo ""
 echo "=== Persistent disk setup complete (mode: $MODE) ==="
 echo ""

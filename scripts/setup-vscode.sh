@@ -1,7 +1,8 @@
 #!/bin/bash
 # =============================================================================
-# Copy VS Code launch.json template into $WORKSPACE_DIR/.vscode/
-# Idempotent: only copies if the target file does not already exist.
+# Symlink VS Code launch.json template into $WORKSPACE_DIR/.vscode/
+# Same pattern as link-dotfiles.sh: git pull in dotfiles updates workspace live.
+# Existing non-symlink files at the target are backed up to .bak.
 # =============================================================================
 set -euo pipefail
 
@@ -33,9 +34,11 @@ fi
 
 mkdir -p "$TARGET_DIR"
 
-if [ -f "$TARGET" ]; then
-  echo "VS Code launch.json already exists at $TARGET, skipping."
-else
-  cp "$TEMPLATE" "$TARGET"
-  echo "Installed VS Code launch.json -> $TARGET"
+# Back up existing real file (not a symlink) before replacing
+if [ -e "$TARGET" ] && [ ! -L "$TARGET" ]; then
+  echo "  Backing up $TARGET -> ${TARGET}.bak"
+  mv "$TARGET" "${TARGET}.bak"
 fi
+
+ln -sfn "$TEMPLATE" "$TARGET"
+echo "Linked VS Code launch.json: $TARGET -> $TEMPLATE"
