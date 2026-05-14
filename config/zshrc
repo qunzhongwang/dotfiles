@@ -80,8 +80,8 @@ if [ -f "$HOME/miniconda3/bin/conda" ]; then
 fi
 
 # --- Claude Code Poe Proxy ---------------------------------------------------
-export ANTHROPIC_BASE_URL="https://api.poe.com"
-export ANTHROPIC_AUTH_TOKEN="$POE_API_KEY"
-export ANTHROPIC_API_KEY="" # Important: Must be explicitly empty
-export EDITOR="cursor"
+# export ANTHROPIC_BASE_URL="https://api.poe.com"
+# export ANTHROPIC_AUTH_TOKEN="$POE_API_KEY"
+# export ANTHROPIC_API_KEY="" # Important: Must be explicitly empty
+# export EDITOR="cursor"
 eval "$(/opt/homebrew/bin/brew shellenv)"
