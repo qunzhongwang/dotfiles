@@ -8,7 +8,11 @@ DISTRO="unknown"
 PKG_MGR=""
 PKG_INSTALL=""
 
-if [ -f /etc/os-release ]; then
+if [ "$(uname -s)" = "Darwin" ]; then
+  DISTRO="macos"
+  PKG_MGR="brew"
+  PKG_INSTALL="brew install"
+elif [ -f /etc/os-release ]; then
   . /etc/os-release
   case "$ID" in
     ubuntu|debian)

@@ -11,8 +11,10 @@ if [ -z "$PKG_MGR" ]; then
   exit 0
 fi
 
-# Check if we can install packages (need root or sudo)
-if [ "$(id -u)" -ne 0 ]; then
+# brew doesn't need sudo; Linux needs root or sudo
+if [ "$PKG_MGR" = "brew" ]; then
+  SUDO=""
+elif [ "$(id -u)" -ne 0 ]; then
   if command -v sudo >/dev/null 2>&1; then
     SUDO="sudo"
   else
@@ -26,6 +28,21 @@ fi
 echo "Installing system packages with $PKG_MGR..."
 
 case "$PKG_MGR" in
+  brew)
+    if ! command -v brew >/dev/null 2>&1; then
+      echo "WARNING: Homebrew not found. Install from https://brew.sh then re-run."
+      exit 0
+    fi
+    brew install \
+      git \
+      git-lfs \
+      tmux \
+      ripgrep \
+      fd \
+      neovim \
+      wget \
+      jq
+    ;;
   apt-get)
     $SUDO apt-get update
     $SUDO apt-get install -y \

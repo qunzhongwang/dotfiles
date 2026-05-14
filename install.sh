@@ -15,16 +15,43 @@ SKIP_SYSTEM=false
 
 for arg in "$@"; do
   case "$arg" in
-    --no-system) SKIP_SYSTEM=true ;;
+    --no-system|--cluster) SKIP_SYSTEM=true ;;
     --help|-h)
-      echo "Usage: bash install.sh [--no-system]"
+      echo "Usage: bash install.sh [--no-system | --cluster]"
       echo "  --no-system  Skip system package installation (no root needed)"
+      echo "  --cluster    Same as --no-system; use on HPC clusters where sudo"
+      echo "               is unavailable. User-level tools (conda, nvm, fzf…)"
+      echo "               are still installed. System tools already present"
+      echo "               (e.g. tmux installed by sysadmin) are configured."
       exit 0
       ;;
   esac
 done
 
 echo "=== Dotfiles Install ==="
+
+# On macOS, ensure Homebrew is available and in PATH.
+# `bash install.sh` starts with a minimal PATH that misses /opt/homebrew/bin,
+# so probe known install locations first. If brew is not found at all, install it.
+if [ "$(uname -s)" = "Darwin" ]; then
+  for _brew_prefix in /opt/homebrew /usr/local "$HOME/.homebrew"; do
+    if [ -x "$_brew_prefix/bin/brew" ]; then
+      eval "$("$_brew_prefix/bin/brew" shellenv)"
+      break
+    fi
+  done
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "Homebrew not found — installing..."
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # Re-probe after install (Apple Silicon lands in /opt/homebrew, Intel in /usr/local)
+    for _brew_prefix in /opt/homebrew /usr/local; do
+      if [ -x "$_brew_prefix/bin/brew" ]; then
+        eval "$("$_brew_prefix/bin/brew" shellenv)"
+        break
+      fi
+    done
+  fi
+fi
 
 # Source .env if exists (secrets may come from .env OR bare env vars)
 if [ -f "$HOME/.env" ]; then
@@ -42,7 +69,7 @@ if [ "$SKIP_SYSTEM" = false ]; then
   echo "--- Installing system packages ---"
   bash "$SCRIPT_DIR/scripts/install-packages.sh"
 else
-  echo "Skipping system packages (--no-system)"
+  echo "Skipping system packages (--no-system / --cluster)"
 fi
 
 # Step 2: User-level tools
@@ -60,8 +87,8 @@ echo ""
 echo "--- Linking dotfiles ---"
 bash "$SCRIPT_DIR/scripts/link-dotfiles.sh"
 
-# Install tmux plugins via TPM (non-interactive)
-if [ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
+# Install tmux plugins via TPM (non-interactive) — skip if tmux not installed
+if [ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ] && command -v tmux >/dev/null 2>&1; then
   echo "Installing tmux plugins..."
   "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true
 fi

@@ -59,14 +59,25 @@ fi
 # --- Miniconda3 ---------------------------------------------------------------
 if [ ! -d "$HOME/miniconda3" ]; then
   echo "Installing Miniconda3..."
-  ARCH=$(uname -m)
-  MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-${ARCH}.sh"
-  curl -fsSL "$MINICONDA_URL" -o /tmp/miniconda.sh
-  bash /tmp/miniconda.sh -b -p "$HOME/miniconda3"
-  rm -f /tmp/miniconda.sh
-  # Initialize for current session
-  eval "$("$HOME/miniconda3/bin/conda" 'shell.bash' 'hook' 2>/dev/null)" || true
-  conda config --set auto_activate_base false
+  UNAME_S=$(uname -s)
+  UNAME_M=$(uname -m)
+  case "$UNAME_S" in
+    Linux)  CONDA_OS="Linux" ;;
+    Darwin) CONDA_OS="MacOSX" ;;
+    *) echo "WARNING: Unsupported OS $UNAME_S for Miniconda3. Skipping."; CONDA_OS="" ;;
+  esac
+  case "$UNAME_M" in
+    x86_64|aarch64|arm64) CONDA_ARCH="$UNAME_M" ;;
+    *) echo "WARNING: Unsupported architecture $UNAME_M for Miniconda3. Skipping."; CONDA_ARCH="" ;;
+  esac
+  if [ -n "$CONDA_OS" ] && [ -n "$CONDA_ARCH" ]; then
+    MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-${CONDA_OS}-${CONDA_ARCH}.sh"
+    curl -fsSL "$MINICONDA_URL" -o /tmp/miniconda.sh
+    bash /tmp/miniconda.sh -b -p "$HOME/miniconda3"
+    rm -f /tmp/miniconda.sh
+    eval "$("$HOME/miniconda3/bin/conda" 'shell.bash' 'hook' 2>/dev/null)" || true
+    conda config --set auto_activate_base false
+  fi
 else
   echo "Miniconda3 already installed, skipping."
 fi
@@ -89,14 +100,29 @@ fi
 mkdir -p "$HOME/bin"
 if [ ! -f "$HOME/bin/cloudflared" ]; then
   echo "Installing cloudflared..."
-  ARCH=$(uname -m)
-  case "$ARCH" in
-    x86_64) CF_ARCH="amd64" ;;
-    aarch64) CF_ARCH="arm64" ;;
-    *) echo "WARNING: Unsupported architecture $ARCH for cloudflared. Skipping."; CF_ARCH="" ;;
+  CF_UNAME_S=$(uname -s)
+  CF_UNAME_M=$(uname -m)
+  case "$CF_UNAME_S" in
+    Linux)  CF_OS="linux" ;;
+    Darwin) CF_OS="darwin" ;;
+    *) echo "WARNING: Unsupported OS $CF_UNAME_S for cloudflared. Skipping."; CF_OS="" ;;
   esac
-  if [ -n "$CF_ARCH" ]; then
-    curl -fsSL "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-${CF_ARCH}" -o "$HOME/bin/cloudflared"
+  case "$CF_UNAME_M" in
+    x86_64)        CF_ARCH="amd64" ;;
+    aarch64|arm64) CF_ARCH="arm64" ;;
+    *) echo "WARNING: Unsupported architecture $CF_UNAME_M for cloudflared. Skipping."; CF_ARCH="" ;;
+  esac
+  if [ -n "$CF_OS" ] && [ -n "$CF_ARCH" ]; then
+    CF_BASE="https://github.com/cloudflare/cloudflared/releases/latest/download"
+    if [ "$CF_OS" = "darwin" ]; then
+      # macOS releases are tarballs
+      curl -fsSL "${CF_BASE}/cloudflared-darwin-${CF_ARCH}.tgz" -o /tmp/cloudflared.tgz
+      tar -xzf /tmp/cloudflared.tgz -C /tmp/
+      mv /tmp/cloudflared "$HOME/bin/cloudflared"
+      rm -f /tmp/cloudflared.tgz
+    else
+      curl -fsSL "${CF_BASE}/cloudflared-linux-${CF_ARCH}" -o "$HOME/bin/cloudflared"
+    fi
     chmod +x "$HOME/bin/cloudflared"
   fi
 else
