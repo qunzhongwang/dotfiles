@@ -12,21 +12,27 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKIP_SYSTEM=false
+AUTHORIZE_SELF=false
 
 for arg in "$@"; do
   case "$arg" in
     --no-system|--cluster) SKIP_SYSTEM=true ;;
+    --authorize-self) AUTHORIZE_SELF=true ;;
     --help|-h)
-      echo "Usage: bash install.sh [--no-system | --cluster]"
-      echo "  --no-system  Skip system package installation (no root needed)"
-      echo "  --cluster    Same as --no-system; use on HPC clusters where sudo"
-      echo "               is unavailable. User-level tools (conda, nvm, fzf…)"
-      echo "               are still installed. System tools already present"
-      echo "               (e.g. tmux installed by sysadmin) are configured."
+      echo "Usage: bash install.sh [--no-system | --cluster] [--authorize-self]"
+      echo "  --no-system       Skip system package installation (no root needed)"
+      echo "  --cluster         Same as --no-system; use on HPC clusters where sudo"
+      echo "                    is unavailable. User-level tools (conda, nvm, fzf…)"
+      echo "                    are still installed. System tools already present"
+      echo "                    (e.g. tmux installed by sysadmin) are configured."
+      echo "  --authorize-self  Append id_ed25519.pub to ~/.ssh/authorized_keys so"
+      echo "                    any other machine using the same SSH_PRIVATE_KEY"
+      echo "                    can SSH in here without a password."
       exit 0
       ;;
   esac
 done
+export AUTHORIZE_SELF
 
 echo "=== Dotfiles Install ==="
 

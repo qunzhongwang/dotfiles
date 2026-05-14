@@ -47,4 +47,19 @@ EOF
   chmod 600 "$HOME/.ssh/config"
 fi
 
+# Optionally authorize this machine's own pubkey so any peer sharing the same
+# SSH_PRIVATE_KEY can SSH in without a password (fleet self-trust pattern).
+if [ "${AUTHORIZE_SELF:-false}" = "true" ]; then
+  AUTH_KEYS="$HOME/.ssh/authorized_keys"
+  touch "$AUTH_KEYS"
+  chmod 600 "$AUTH_KEYS"
+  PUB=$(cat "$HOME/.ssh/id_ed25519.pub")
+  if ! grep -qxF "$PUB" "$AUTH_KEYS"; then
+    echo "$PUB" >> "$AUTH_KEYS"
+    echo "Authorized id_ed25519.pub in ~/.ssh/authorized_keys (passwordless SSH for peers with the same key)."
+  else
+    echo "id_ed25519.pub already present in authorized_keys, skipping."
+  fi
+fi
+
 echo "SSH key configured (ed25519, GitHub-only)."
